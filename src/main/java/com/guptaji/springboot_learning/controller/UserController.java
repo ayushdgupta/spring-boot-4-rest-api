@@ -92,4 +92,10 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/useOfBean")
+    public ResponseEntity<?> processAllUsers(){
+        userService.processAllUsers();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

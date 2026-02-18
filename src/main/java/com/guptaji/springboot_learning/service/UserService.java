@@ -11,4 +11,5 @@ public interface UserService {
     User extractUserById(String id);
     boolean updateUserNameById(String id, String name);
     boolean deleteUserById(String id);
+    void processAllUsers();
 }

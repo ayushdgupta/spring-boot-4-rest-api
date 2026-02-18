@@ -19,6 +19,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private UsersUtility usersUtility;
+
     @Override
     public void addUser(User user) {
         User persistedUser = userRepo.save(user);
@@ -44,7 +47,6 @@ public class UserServiceImpl implements UserService {
 
         // M1 -> one way to update the data is to use save method but that will update the entire data
         // apart from key, but we need to update the name only so that's why we used native query
-
         int count = userRepo.updateNameById(name, id);
         LOG.info("Count of members updated {}", count);
         return count > 0;
@@ -61,4 +63,11 @@ public class UserServiceImpl implements UserService {
             return true;
         }
     }
+
+    @Override
+    public void processAllUsers() {
+        List<User> allUsers = userRepo.findAll();
+        allUsers.forEach(user -> usersUtility.processUser(user));
+    }
+
 }
