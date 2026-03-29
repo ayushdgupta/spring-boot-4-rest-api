@@ -1,7 +1,7 @@
 package com.guptaji.springboot_learning.controller;
 
 import com.guptaji.springboot_learning.entity.User;
-import com.guptaji.springboot_learning.service.UserService;
+import com.guptaji.springboot_learning.entity.UserDto;
 import com.guptaji.springboot_learning.service.impl.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.util.List;
 
 // http://localhost:8081/swagger-ui/index.html
 @RestController
-@RequestMapping("/userApi")
+@RequestMapping(path = "/userApi/v{ver}", version = "1")
 public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
@@ -29,9 +29,9 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getAllUser")
+    @GetMapping(path = "/getAllUser", version = "1.0.1")
     public ResponseEntity<?> fetchAllUser(){
-        LOG.info("Extracting all users from DB");
+        LOG.info("Extracting all users from DB from v1.0.1");
         List<User> users = userService.extractAllUsers();
         if (users.isEmpty()){
             return new ResponseEntity<>(users, HttpStatus.NO_CONTENT);
@@ -41,6 +41,7 @@ public class UserController {
     }
 
     // get the data using path variable
+    // localhost:8081/userApi/getById/4
     @GetMapping("/getById/{userId}")
     public ResponseEntity<?> getById(@PathVariable("userId") String id){
         LOG.info("Extracting user from DB using path variable for the id {}", id);
