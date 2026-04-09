@@ -16,7 +16,7 @@ import java.util.List;
 
 // URI-based API Versioning
 @RestController
-@RequestMapping(path = "/userApi/v{ver}", version = "2")
+@RequestMapping(path = "/userApi/v{ver}", version = "2.0.0")
 public class UserV2Controller {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserV2Controller.class);
@@ -25,9 +25,9 @@ public class UserV2Controller {
     private UserServiceImpl userService;
 
     // URL http://localhost:8081/userApi/v2.0.1/getAllUser
-    @GetMapping(path = "/getAllUser", version = "2.0.1")
+    @GetMapping(path = "/getAllUser")
     public ResponseEntity<?> fetchAllUserV21(){
-        LOG.info("Extracting all users from DB from v2.0.1");
+        LOG.info("Extracting all users from DB from v2.0.0");
         List<User> users = userService.extractAllUsers();
         List<UserDto> userDtoList = users.stream().map(UserDto::new).toList();
         if (users.isEmpty()){
@@ -38,9 +38,9 @@ public class UserV2Controller {
     }
 
     // URL http://localhost:8081/userApi/v2.0.2/getAllUser
-    @GetMapping(path = "/getAllUser", version = "2.0.2")
+    @GetMapping(path = "/getAllUser", version = "2.0.1")
     public ResponseEntity<?> fetchAllUserV22(){
-        LOG.info("Extracting all users from DB from v2.0.2");
+        LOG.info("Extracting all users from DB from v2.0.1");
         List<User> users = userService.extractAllUsers();
         List<UserDto> userDtoList = users.stream().map(UserDto::new).toList();
         if (users.isEmpty()){

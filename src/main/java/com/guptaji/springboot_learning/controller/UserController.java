@@ -14,7 +14,9 @@ import java.util.List;
 
 // http://localhost:8081/swagger-ui/index.html
 @RestController
-@RequestMapping(path = "/userApi/v{ver}", version = "1")
+@RequestMapping(path = "/userApi/v{ver}", version = "1.0.0")
+//@RequestMapping(path = "/userApi/", version = "1.0.0")  this is used for header versioning
+//@RequestMapping(path = "/userApi/", params = "version=1.0.0") this is used for query param based versioning
 public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
@@ -29,8 +31,19 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/getAllUser", version = "1.0.1")
+    @GetMapping(path = "/getAllUser")
     public ResponseEntity<?> fetchAllUser(){
+        LOG.info("Extracting all users from DB from v1.0.0");
+        List<User> users = userService.extractAllUsers();
+        if (users.isEmpty()){
+            return new ResponseEntity<>(users, HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping(path = "/getAllUser", version = "1.0.1")
+    public ResponseEntity<?> fetchAllUserForHeaderVersioning(){
         LOG.info("Extracting all users from DB from v1.0.1");
         List<User> users = userService.extractAllUsers();
         if (users.isEmpty()){
