@@ -4,10 +4,14 @@ import com.guptaji.springboot_learning.service.impl.UserHelper;
 import com.guptaji.springboot_learning.service.impl.UsersUtility;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.resilience.annotation.EnableResilientMethods;
 
 @Configuration
+@EnableCaching
+@EnableResilientMethods
 public class CodeConfigs {
 
     @Value("${name.prefix}")
