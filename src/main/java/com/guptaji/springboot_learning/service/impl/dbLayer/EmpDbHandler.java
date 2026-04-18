@@ -30,6 +30,7 @@ public class EmpDbHandler {
     private CacheInspectionServiceImpl cacheInspectionService;
 
     @Retryable(maxRetries = 3, delay = 1000)
+    @CachePut(value = EMP_CACHE_NAME, key = "#emp.empId")
     public Employee persistEmployeeData(Employee emp) {
         LOG.info("saving employee {} in db", emp);
         Employee savedEmployee = empRepo.save(emp);
