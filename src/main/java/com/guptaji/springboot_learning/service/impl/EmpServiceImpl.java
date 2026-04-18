@@ -66,4 +66,11 @@ public class EmpServiceImpl implements EmpService {
         Employee emp = empDbHandler.updateEmployee(employee);
         return emp;
     }
+
+    @Override
+    public Employee updateEmployeeName(Employee employee) {
+        LOG.info("Updating employee name");
+        Employee updatedEmployee = empDbHandler.updateEmployeeName(employee);
+        return updatedEmployee;
+    }
 }

@@ -77,4 +77,11 @@ public class EmpController {
         empService.deleteById(empId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PutMapping(path = "/updateEmpName")
+    public ResponseEntity<?> updateEmpName(@RequestBody Employee employee){
+        LOG.info("Request received for updating the employee name {}", employee.getEmpId());
+        Employee updatedEmployee = empService.updateEmployeeName(employee);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+    }
 }

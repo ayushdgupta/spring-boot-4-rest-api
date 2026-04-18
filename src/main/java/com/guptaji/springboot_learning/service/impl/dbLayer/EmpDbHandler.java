@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
@@ -73,6 +74,23 @@ public class EmpDbHandler {
     public Employee updateEmployee(Employee employee) {
         Employee savedEmployee = empRepo.save(employee);
         LOG.info("Employee has been updated");
+        return savedEmployee;
+    }
+
+    // for use of @Caching we did it or else simple @CachePut will work here
+    // Here my expectation was that first it'll evict the cache then it'll do the put
+    // bt it seems either it's doing evict only or it's doing evict after put
+    // so I am getting empty cache after running this method
+    @Retryable(maxRetries = 3, delay = 1000)
+    @Caching(evict = {
+            @CacheEvict(value = EMP_CACHE_NAME, key = "#employee.empId")
+    },
+    put = {
+            @CachePut(value = EMP_CACHE_NAME, key = "#employee.empId")
+    })
+    public Employee updateEmployeeName(Employee employee) {
+        Employee savedEmployee = empRepo.save(employee);
+        LOG.info("Employee first Name has been updated");
         return savedEmployee;
     }
 }
