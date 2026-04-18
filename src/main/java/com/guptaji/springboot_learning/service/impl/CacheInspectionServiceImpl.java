@@ -28,4 +28,15 @@ public class CacheInspectionServiceImpl implements CacheInspectionService {
             return "NO_CACHE";
         }
     }
+
+    @Override
+    public void evictCache(String cacheName, Long empId) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null){
+            cache.evict(empId);
+            LOG.info("Eviction from cache {} is done for the key {}", cacheName, empId);
+        } else {
+            LOG.info("Cache {} not present", cacheName);
+        }
+    }
 }
