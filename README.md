@@ -1,4 +1,6 @@
 ### REDIS Cache
+
+```markdown
 // commands to install redis-cli in local windows
 
 curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg    
@@ -11,8 +13,12 @@ sudo apt-get install redis
 sudo service redis-server start    
 
 redis-cli
+```
 
+```markdown
 // commands to run redis-cli in wsl system command prompt
 ping  --> response should be pong    
 get CACHE_NAME::CACHE_KEY ---> to pring value stored on cache_key    
-keys * ---> to print all cache data    
+keys * ---> to print all cache data  
+```
+
