@@ -2,9 +2,11 @@ package com.guptaji.springboot_learning.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "employee")
-public class Employee implements Comparable<Employee> {
+public class Employee implements Comparable<Employee>, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
