@@ -11,6 +11,25 @@ public class Organization {
     @Id
     private Long orgId;
     private String orgName;
+    private int branches;
+    private Long noOfEmployees;
+
+
+    public int getBranches() {
+        return branches;
+    }
+
+    public void setBranches(int branches) {
+        this.branches = branches;
+    }
+
+    public Long getNoOfEmployees() {
+        return noOfEmployees;
+    }
+
+    public void setNoOfEmployees(Long noOfEmployees) {
+        this.noOfEmployees = noOfEmployees;
+    }
 
     public Long getOrgId() {
         return orgId;
@@ -27,4 +46,5 @@ public class Organization {
     public void setOrgName(String orgName) {
         this.orgName = orgName;
     }
+
 }

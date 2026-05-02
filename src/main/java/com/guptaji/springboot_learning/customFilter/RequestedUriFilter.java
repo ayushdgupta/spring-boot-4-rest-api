@@ -16,6 +16,7 @@ public class RequestedUriFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
+
         LOG.info("Custom Filter of application has been invoked");
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         LOG.info("Requested URI {}", httpServletRequest.getRequestURI());

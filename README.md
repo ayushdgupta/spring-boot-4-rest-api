@@ -22,3 +22,7 @@ get CACHE_NAME::CACHE_KEY ---> to pring value stored on cache_key
 keys * ---> to print all cache data  
 ```
 
+### Spring-Security
+
+## Basic Architecture
+![Basic security architecture with default username password](src/main/resources/spring-security.png)
