@@ -1,5 +1,6 @@
 package com.guptaji.springboot_learning.config;
 
+import com.guptaji.springboot_learning.constant.UserRoles;
 import com.guptaji.springboot_learning.service.impl.UserHelper;
 import com.guptaji.springboot_learning.service.impl.UsersUtility;
 import io.swagger.v3.oas.models.Components;
@@ -15,6 +16,12 @@ import org.springframework.resilience.annotation.EnableResilientMethods;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static com.guptaji.springboot_learning.constant.Constants.*;
@@ -30,6 +37,18 @@ public class CodeConfigs {
 
     @Value("${name.suffix}")
     private String suffix;
+
+    @Value("${custom.security.user1.name}")
+    private String userOne;
+
+    @Value("${custom.security.user2.name}")
+    private String userTwo;
+
+    @Value("${custom.security.user1.pass}")
+    private String userOnePassword;
+
+    @Value("${custom.security.user2.pass}")
+    private String userTwoPassword;
 
     @Bean("userHelper")
     public UserHelper userHelper(){
@@ -47,6 +66,30 @@ public class CodeConfigs {
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // config for in-memory user
+    @Bean
+    public UserDetailsService userDetailsService(){
+
+        UserDetails userDetailsOne = User
+                .withUsername(userOne)
+                .password(passwordEncoder().encode(userOnePassword))
+                .roles(UserRoles.ROLE_ADMIN.getRole())
+                .build();
+
+        UserDetails userDetailsTwo = User
+                .withUsername(userTwo)
+                .password(passwordEncoder().encode(userTwoPassword))
+                .roles(UserRoles.ROLE_USER.getRole())
+                .build();
+
+        return new InMemoryUserDetailsManager(userDetailsOne, userDetailsTwo);
     }
 
     // created to pass CSRF token in swagger-ui, by this config authorize button will be enable
