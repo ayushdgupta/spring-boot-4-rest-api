@@ -18,7 +18,7 @@ redis-cli
 ```markdown
 // commands to run redis-cli in wsl system command prompt
 ping  --> response should be pong    
-get CACHE_NAME::CACHE_KEY ---> to pring value stored on cache_key    
+get CACHE_NAME::CACHE_KEY ---> to print values stored on cache_key    
 keys * ---> to print all cache data  
 ```
 
@@ -26,3 +26,24 @@ keys * ---> to print all cache data
 
 ## Basic Architecture
 ![Basic security architecture with default username password](src/main/resources/spring-security.png)
+
+## Config for in-memory users
+```yaml
+@Bean
+public UserDetailsService userDetailsService(){
+
+    UserDetails userDetailsOne = User
+            .withUsername(userOne)
+            .password(passwordEncoder().encode(userOnePassword))
+            .roles(UserRoles.ROLE_ADMIN.getRole())
+            .build();
+
+    UserDetails userDetailsTwo = User
+            .withUsername(userTwo)
+            .password(passwordEncoder().encode(userTwoPassword))
+            .roles(UserRoles.ROLE_USER.getRole())
+            .build();
+
+    return new InMemoryUserDetailsManager(userDetailsOne, userDetailsTwo);
+}
+```
