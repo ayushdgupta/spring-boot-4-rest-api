@@ -16,6 +16,7 @@ import org.springframework.resilience.annotation.EnableResilientMethods;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -63,7 +64,10 @@ public class CodeConfigs {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
         return httpSecurity
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .csrf(AbstractHttpConfigurer::disable)              // disable the csrf token
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers(SIGN_UP_PATTERN).permitAll()  // permit all sign-up requests
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
@@ -92,19 +96,21 @@ public class CodeConfigs {
         return new InMemoryUserDetailsManager(userDetailsOne, userDetailsTwo);
     }
 
-    // created to pass CSRF token in swagger-ui, by this config authorize button will be enable
+    // created to pass CSRF token in swagger-ui, by this config authorize button will be enabled
     // in swagger in which we can pass csrf token
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .components(
-                        new Components()
-                        .addSecuritySchemes("csrf",
-                                new SecurityScheme().type(SecurityScheme.Type.APIKEY)
-                                        .in(SecurityScheme.In.HEADER)
-                                        .name(CSRF_TOKEN_HEADER)
-                        )
-                )
-                .addSecurityItem(new SecurityRequirement().addList("csrf"));
-    }
+    // commenting out below config as we are disabling csrf token for now
+//    @Bean
+//    public OpenAPI customOpenAPI() {
+//        return new OpenAPI()
+//                .components(
+//                        new Components()
+//                        .addSecuritySchemes("csrf",
+//                                new SecurityScheme().type(SecurityScheme.Type.APIKEY)
+//                                        .in(SecurityScheme.In.HEADER)
+//                                        .name(CSRF_TOKEN_HEADER)
+//                        )
+//                )
+//                .addSecurityItem(new SecurityRequirement().addList("csrf"));
+//    }
+
 }

@@ -11,6 +11,17 @@ public enum UserRoles {
         this.role = role;
     }
 
+    public static boolean allowedRoles(String role) {
+
+        for (UserRoles roles : values()){
+            if (roles.getRole().equalsIgnoreCase(role)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public String getRole() {
         return role;
     }

@@ -1,5 +1,6 @@
 package com.guptaji.springboot_learning.controller;
 
+import com.guptaji.springboot_learning.constant.UserRoles;
 import com.guptaji.springboot_learning.entity.User;
 import com.guptaji.springboot_learning.entity.UserDto;
 import com.guptaji.springboot_learning.service.impl.UserServiceImpl;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import static com.guptaji.springboot_learning.constant.Constants.*;
 
 // http://localhost:8081/swagger-ui/index.html
 @RestController
@@ -111,5 +113,20 @@ public class UserController {
     public ResponseEntity<?> processAllUsers(){
         userService.processAllUsers();
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(SIGN_UP)
+    public ResponseEntity<?> signUpUser(@RequestBody User user){
+
+        LOG.info("Verifying the role");
+        String userRole = user.getUserType();
+        if (UserRoles.allowedRoles(userRole)){
+            LOG.info("Creating an user");
+            userService.addUser(user);
+            return new ResponseEntity<>(user, HttpStatus.CREATED);
+        } else {
+            LOG.info("Role {} is not allowed now", userRole);
+            return new ResponseEntity<>("Passed role is not allowed", HttpStatus.BAD_REQUEST);
+        }
     }
 }

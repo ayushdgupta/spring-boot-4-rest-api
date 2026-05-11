@@ -1,3 +1,6 @@
+## Swagger-URL
+http://localhost:8081/swagger-ui/index.html
+
 ### REDIS Cache
 
 ```markdown
@@ -26,6 +29,25 @@ keys * ---> to print all cache data
 
 ## Basic Architecture
 ![Basic security architecture with default username password](src/main/resources/spring-security.png)
+
+## config to enable csrf token in swagger
+1. Below config will enable authorize button in swagger where we can pass csrf token to authorize our requests.
+
+```yaml
+@Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(
+                        new Components()
+                        .addSecuritySchemes("csrf",
+                                new SecurityScheme().type(SecurityScheme.Type.APIKEY)
+                                        .in(SecurityScheme.In.HEADER)
+                                        .name(CSRF_TOKEN_HEADER)
+                        )
+                )
+                .addSecurityItem(new SecurityRequirement().addList("csrf"));
+    }
+```
 
 ## Config for in-memory users
 ```yaml

@@ -12,6 +12,7 @@ public class User implements Comparable<User>{
     private String id;
     private String name;
     private String userType;
+    private String password;
 
     public String getName() {
         return name;
@@ -37,17 +38,26 @@ public class User implements Comparable<User>{
         this.userType = userType;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                ", id='" + id + '\'' +
-                ", userType='" + userType + '\'' +
-                '}';
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public int compareTo(User incomingUser) {
         return this.id.compareTo(incomingUser.getId());
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", userType='" + userType + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }
