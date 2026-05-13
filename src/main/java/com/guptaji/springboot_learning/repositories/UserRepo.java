@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepo extends JpaRepository<User, String> {
 
@@ -15,4 +17,6 @@ public interface UserRepo extends JpaRepository<User, String> {
     @Transactional
     @Query(value = "update users SET name = :fullName where id =:id", nativeQuery = true)
     int updateNameById(@Param("fullName") String fullName, @Param("id") String id);
+
+    Optional<User> findByName(String userName);
 }

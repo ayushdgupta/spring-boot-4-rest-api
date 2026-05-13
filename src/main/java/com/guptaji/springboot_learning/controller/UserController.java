@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,9 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/addUser")
     public ResponseEntity<?> createUser(@RequestBody User user){
@@ -121,6 +125,8 @@ public class UserController {
         LOG.info("Verifying the role");
         String userRole = user.getUserType();
         if (UserRoles.allowedRoles(userRole)){
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            LOG.info("Encoded the password {}", user.getPassword());
             LOG.info("Creating an user");
             userService.addUser(user);
             return new ResponseEntity<>(user, HttpStatus.CREATED);

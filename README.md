@@ -69,3 +69,29 @@ public UserDetailsService userDetailsService(){
     return new InMemoryUserDetailsManager(userDetailsOne, userDetailsTwo);
 }
 ```
+
+## Session policy in security config
+Here we are using httpBasic which by-default uses STATELESS session policy internally i.e. with every request we 
+need to pass creds to authenticate ourselves which will call this method 'loadUserByUsername' everytime, but if we 
+do not want to provide creds everytime i.e. with first request we will provide creds then via sessions only browser 
+will send some Jsessions which will be used by the servers for authentication further then we can use following 
+config -
+```yaml
+.sessionManagement(httpSecuritySessionManagementConfigurer ->
+         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+```
+with above config there is no need to send creds everytime. In our actual config we have provided STATELESS policy 
+externally to just make sure it should not store any session and ask for creds everytime.
+```yaml
+return httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)              // disable the csrf token
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers(SIGN_UP_PATTERN).permitAll()  // permit all sign-up requests
+                        .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+//                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .build();
+```

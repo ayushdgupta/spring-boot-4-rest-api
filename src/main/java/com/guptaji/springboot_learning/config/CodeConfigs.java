@@ -1,6 +1,8 @@
 package com.guptaji.springboot_learning.config;
 
 import com.guptaji.springboot_learning.constant.UserRoles;
+import com.guptaji.springboot_learning.service.DbUserDetailsService;
+import com.guptaji.springboot_learning.service.impl.DbUserDetailsServiceImpl;
 import com.guptaji.springboot_learning.service.impl.UserHelper;
 import com.guptaji.springboot_learning.service.impl.UsersUtility;
 import io.swagger.v3.oas.models.Components;
@@ -13,10 +15,13 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.resilience.annotation.EnableResilientMethods;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -63,12 +68,30 @@ public class CodeConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
+
+        /**
+         * 1. Session creation policy -- Here we are using httpBasic which by-default uses STATELESS session
+         * policy internally i.e. with every request we need to pass creds to authenticate ourselves which will
+         * call this method 'loadUserByUsername' everytime, but if we do not want to provide creds everytime
+         * i.e. with first request we will provide creds then via sessions only browser will send some Jsessions
+         * which will be used by the servers for authentication further then we can use following config -
+         * .sessionManagement(httpSecuritySessionManagementConfigurer ->
+         *          httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+         * with above config there is no need to send creds everytime. In our actual config we have provided
+         * STATELESS policy externally to just make sure it should not store any session and ask for creds
+         * everytime.
+         */
+
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)              // disable the csrf token
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(SIGN_UP_PATTERN).permitAll()  // permit all sign-up requests
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
+                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+//                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .build();
     }
 
@@ -81,19 +104,31 @@ public class CodeConfigs {
     @Bean
     public UserDetailsService userDetailsService(){
 
-        UserDetails userDetailsOne = User
-                .withUsername(userOne)
-                .password(passwordEncoder().encode(userOnePassword))
-                .roles(UserRoles.ROLE_ADMIN.getRole())
-                .build();
+        // config for in-memory user
+//        UserDetails userDetailsOne = User
+//                .withUsername(userOne)
+//                .password(passwordEncoder().encode(userOnePassword))
+//                .roles(UserRoles.ROLE_ADMIN.getRole())
+//                .build();
+//
+//        UserDetails userDetailsTwo = User
+//                .withUsername(userTwo)
+//                .password(passwordEncoder().encode(userTwoPassword))
+//                .roles(UserRoles.ROLE_USER.getRole())
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(userDetailsOne, userDetailsTwo);
 
-        UserDetails userDetailsTwo = User
-                .withUsername(userTwo)
-                .password(passwordEncoder().encode(userTwoPassword))
-                .roles(UserRoles.ROLE_USER.getRole())
-                .build();
+        // config for db user
+        return new DbUserDetailsServiceImpl();
+    }
 
-        return new InMemoryUserDetailsManager(userDetailsOne, userDetailsTwo);
+    @Bean
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
+                                                         PasswordEncoder passwordEncoder){
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+        return daoAuthenticationProvider;
     }
 
     // created to pass CSRF token in swagger-ui, by this config authorize button will be enabled
