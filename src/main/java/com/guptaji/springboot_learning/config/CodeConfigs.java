@@ -15,9 +15,11 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.resilience.annotation.EnableResilientMethods;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -80,12 +82,15 @@ public class CodeConfigs {
          * with above config there is no need to send creds everytime. In our actual config we have provided
          * STATELESS policy externally to just make sure it should not store any session and ask for creds
          * everytime.
+         *
+         * 2. HttpBasic -> By default spring uses UserNamePasswordAuthentication filter but httpBasic uses
+         * BasicAuthenticationFilter which also needs creds to perform authentication.
          */
 
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)              // disable the csrf token
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(SIGN_UP_PATTERN).permitAll()  // permit all sign-up requests
+                        auth.requestMatchers(SIGN_UP_PATTERN, LOGIN_PATTERN).permitAll()  // permit all sign-up, login requests
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
@@ -129,6 +134,11 @@ public class CodeConfigs {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return daoAuthenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     // created to pass CSRF token in swagger-ui, by this config authorize button will be enabled

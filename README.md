@@ -95,3 +95,6 @@ return httpSecurity
 //                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .build();
 ```
+
+## JSON Web Token (JWT) Flow
+![Basic flow of jwt token](src/main/resources/jwt-flow.png)

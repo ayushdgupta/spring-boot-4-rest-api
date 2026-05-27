@@ -3,12 +3,17 @@ package com.guptaji.springboot_learning.controller;
 import com.guptaji.springboot_learning.constant.UserRoles;
 import com.guptaji.springboot_learning.entity.User;
 import com.guptaji.springboot_learning.entity.UserDto;
+import com.guptaji.springboot_learning.service.impl.JwtServiceImpl;
 import com.guptaji.springboot_learning.service.impl.UserServiceImpl;
+import com.guptaji.springboot_learning.util.CommonUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +34,12 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtServiceImpl jwtService;
 
     @PostMapping("/addUser")
     public ResponseEntity<?> createUser(@RequestBody User user){
@@ -133,6 +144,26 @@ public class UserController {
         } else {
             LOG.info("Role {} is not allowed now", userRole);
             return new ResponseEntity<>("Passed role is not allowed", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(LOGIN)
+    public ResponseEntity<?> loginUser(@RequestBody User user){
+
+        LOG.info("Verifying the user {}", user.getName());
+        try {
+            Authentication authentication = CommonUtility.verifyUser(authenticationManager, user);
+            if (authentication.isAuthenticated()){
+                LOG.info("Verified user {}", user.getName());
+                String token = jwtService.generateToken(user);
+                return new ResponseEntity<>(token, HttpStatus.OK);
+            } else {
+                LOG.info("user {} is not present", user.getName());
+                return new ResponseEntity<>("You are not an existing user", HttpStatus.NOT_FOUND);
+            }
+        } catch (BadCredentialsException e){
+            LOG.info("user {} is not present", user.getName());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 }
