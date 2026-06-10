@@ -3,6 +3,8 @@ package com.guptaji.springboot_learning.controller;
 import com.guptaji.springboot_learning.constant.UserRoles;
 import com.guptaji.springboot_learning.entity.User;
 import com.guptaji.springboot_learning.entity.UserDto;
+import com.guptaji.springboot_learning.model.UserLoginDto;
+import com.guptaji.springboot_learning.model.UserTokenDto;
 import com.guptaji.springboot_learning.service.impl.JwtServiceImpl;
 import com.guptaji.springboot_learning.service.impl.UserServiceImpl;
 import com.guptaji.springboot_learning.util.CommonUtility;
@@ -148,21 +150,21 @@ public class UserController {
     }
 
     @PostMapping(LOGIN)
-    public ResponseEntity<?> loginUser(@RequestBody User user){
+    public ResponseEntity<?> loginUser(@RequestBody UserLoginDto user){
 
-        LOG.info("Verifying the user {}", user.getName());
+        LOG.info("Verifying the user {}", user.getUserName());
         try {
             Authentication authentication = CommonUtility.verifyUser(authenticationManager, user);
             if (authentication.isAuthenticated()){
-                LOG.info("Verified user {}", user.getName());
+                LOG.info("Verified user {}", user.getUserName());
                 String token = jwtService.generateToken(user);
-                return new ResponseEntity<>(token, HttpStatus.OK);
+                return new ResponseEntity<>(new UserTokenDto(user.getUserName(), token), HttpStatus.OK);
             } else {
-                LOG.info("user {} is not present", user.getName());
+                LOG.info("user {} is not present", user.getUserName());
                 return new ResponseEntity<>("You are not an existing user", HttpStatus.NOT_FOUND);
             }
         } catch (BadCredentialsException e){
-            LOG.info("user {} is not present", user.getName());
+            LOG.info("user {} is not present", user.getUserName());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }

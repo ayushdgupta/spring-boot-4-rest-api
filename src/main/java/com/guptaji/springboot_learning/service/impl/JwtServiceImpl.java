@@ -1,6 +1,7 @@
 package com.guptaji.springboot_learning.service.impl;
 
 import com.guptaji.springboot_learning.entity.User;
+import com.guptaji.springboot_learning.model.UserLoginDto;
 import com.guptaji.springboot_learning.service.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -41,7 +42,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(User user) {
+    public String generateToken(UserLoginDto user) {
 
         LOG.info("Generating token");
         Map<String, String> claims = new HashMap<>();
@@ -49,7 +50,7 @@ public class JwtServiceImpl implements JwtService {
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(user.getName())
+                .subject(user.getUserName())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
                 .signWith(generateKey(secretKey))

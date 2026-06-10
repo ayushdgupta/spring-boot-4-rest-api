@@ -2,6 +2,7 @@ package com.guptaji.springboot_learning.util;
 
 import com.guptaji.springboot_learning.constant.UserRoles;
 import com.guptaji.springboot_learning.entity.User;
+import com.guptaji.springboot_learning.model.UserLoginDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +15,9 @@ public class CommonUtility {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommonUtility.class);
 
-    public static Authentication verifyUser(AuthenticationManager authenticationManager, User user) {
+    public static Authentication verifyUser(AuthenticationManager authenticationManager, UserLoginDto user) {
         Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getName(), user.getPassword()));
+                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
         return authenticate;
     }
 }
