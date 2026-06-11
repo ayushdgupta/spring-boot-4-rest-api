@@ -98,3 +98,26 @@ return httpSecurity
 
 ## JSON Web Token (JWT) Flow
 ![Basic flow of jwt token](src/main/resources/jwt-flow.png)
+
+## Swagger config for JWT
+1. Following config can be used to enable authorize button in swagger and then we can pass JWT token in it.
+```yaml
+@Bean
+    public OpenAPI customOpenAPIForJwt() {
+
+        return new OpenAPI()
+                .components(
+                        new Components()
+                                .addSecuritySchemes(
+                                        "bearerAuth",
+                                        new SecurityScheme()
+                                                .type(SecurityScheme.Type.HTTP)
+                                                .scheme("bearer")
+                                                .bearerFormat("JWT")
+                                )
+                )
+                .addSecurityItem(
+                        new SecurityRequirement().addList("bearerAuth")
+                );
+    }
+```

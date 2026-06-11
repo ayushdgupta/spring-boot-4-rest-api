@@ -8,6 +8,7 @@ import com.guptaji.springboot_learning.model.UserTokenDto;
 import com.guptaji.springboot_learning.service.impl.JwtServiceImpl;
 import com.guptaji.springboot_learning.service.impl.UserServiceImpl;
 import com.guptaji.springboot_learning.util.CommonUtility;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

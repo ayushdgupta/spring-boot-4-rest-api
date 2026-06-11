@@ -11,4 +11,8 @@ public class Constants {
     public static final String LOGIN_PATTERN = "/userApi/v1.0.0/login";
     public static final String KEY_GEN_ALGO = "HmacSHA256";
     public static final String ROLE = "role";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String JWT_PREFIX = "Bearer ";
+    public static final String SWAGGER_UI_URL = "/swagger-ui/**";
+    public static final String SWAGGER_API_UI_URL = "/v3/api-docs/**";
 }
