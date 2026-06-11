@@ -121,3 +121,76 @@ return httpSecurity
                 );
     }
 ```
+
+## Code to add the jwt token in filter chain
+1. Here we commented out httpBasic because if we will not comment it then if jwt is not passed or incorrect jwt
+is passed then it'll go for basic authentication using creds and if creds will be there then it'll allow
+2. authentication using that, so JWT will be bypassed here.
+```java
+return httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)              // disable the csrf token
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers(SIGN_UP_PATTERN, LOGIN_PATTERN, SWAGGER_UI_URL,
+                                        SWAGGER_API_UI_URL).permitAll()  // permit all sign-up, login requests
+                        .anyRequest().authenticated())
+//                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+//                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class)
+                .build();
+```
+
+## Code to generate JWT
+```java
+public String generateToken(UserLoginDto user) {
+
+        LOG.info("Generating token");
+        Map<String, String> claims = new HashMap<>();
+        claims.put(ROLE, user.getUserType());
+
+        return Jwts.builder()
+                .claims(claims)
+                .subject(user.getUserName())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30 * 2))
+                .signWith(generateKey(secretKey))
+                .compact();
+    }
+```
+
+## Code to verify the token
+```java
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String token = "", userName = "";
+
+        if (authHeader != null && authHeader.startsWith(JWT_PREFIX)){
+            token = authHeader.substring(JWT_PREFIX.length());
+            userName = jwtService.extractUserName(token);
+        }
+
+        // userName should not be null and user should not be already authenticated so now validate the token
+        // else user is already authenticated
+        if (userName != null && !userName.isEmpty() &&
+                SecurityContextHolder.getContext().getAuthentication() == null){
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+            if (jwtService.validateToken(token, userDetails)){
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null,
+                                userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } else {
+            // added this else block just for my checking or else not needed
+            LOG.info("User {} is already authenticated", userName);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+```
