@@ -1,11 +1,13 @@
 package com.guptaji.springboot_learning.controller;
 
 import com.guptaji.springboot_learning.constant.UserRoles;
+import com.guptaji.springboot_learning.entity.RefreshToken;
 import com.guptaji.springboot_learning.entity.User;
 import com.guptaji.springboot_learning.entity.UserDto;
 import com.guptaji.springboot_learning.model.UserLoginDto;
 import com.guptaji.springboot_learning.model.UserTokenDto;
 import com.guptaji.springboot_learning.service.impl.JwtServiceImpl;
+import com.guptaji.springboot_learning.service.impl.RefreshTokenServiceImpl;
 import com.guptaji.springboot_learning.service.impl.UserServiceImpl;
 import com.guptaji.springboot_learning.util.CommonUtility;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -43,6 +45,9 @@ public class UserController {
 
     @Autowired
     private JwtServiceImpl jwtService;
+
+    @Autowired
+    private RefreshTokenServiceImpl refreshTokenService;
 
     @PostMapping("/addUser")
     public ResponseEntity<?> createUser(@RequestBody User user){
@@ -158,8 +163,27 @@ public class UserController {
             Authentication authentication = CommonUtility.verifyUser(authenticationManager, user);
             if (authentication.isAuthenticated()){
                 LOG.info("Verified user {}", user.getUserName());
-                String token = jwtService.generateToken(user);
-                return new ResponseEntity<>(new UserTokenDto(user.getUserName(), token), HttpStatus.OK);
+                String jwtToken = jwtService.generateToken(user);
+                RefreshToken refreshTokenByUserName = refreshTokenService.findRefreshTokenByUserName(user.getUserName());
+                String refreshToken = null;
+                if (refreshTokenByUserName == null){
+                    LOG.info("No existing refresh token found need to create new one");
+                } else {
+                    boolean refreshTokenExpired = refreshTokenService.isRefreshTokenExpired(refreshTokenByUserName);
+                    if (refreshTokenExpired){
+                        LOG.info("Refresh token exist but expired so deleting the existing one");
+                        refreshTokenService.deleteExistingToken(refreshTokenByUserName);
+                    } else {
+                        LOG.info("Refresh token exist and valid");
+                        refreshToken = refreshTokenByUserName.getToken();
+                    }
+                }
+
+                if (refreshToken == null){
+                    refreshToken = refreshTokenService.generateRefreshToken(user.getUserName());
+                }
+                return new ResponseEntity<>(new UserTokenDto(user.getUserName(), jwtToken, refreshToken),
+                        HttpStatus.OK);
             } else {
                 LOG.info("user {} is not present", user.getUserName());
                 return new ResponseEntity<>("You are not an existing user", HttpStatus.NOT_FOUND);

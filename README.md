@@ -124,8 +124,8 @@ return httpSecurity
 
 ## Code to add the jwt token in filter chain
 1. Here we commented out httpBasic because if we will not comment it then if jwt is not passed or incorrect jwt
-is passed then it'll go for basic authentication using creds and if creds will be there then it'll allow
-2. authentication using that, so JWT will be bypassed here.
+is passed then it'll go for basic authentication using creds and if creds will be there then it'll allow 
+authentication using that, so JWT will be bypassed here.
 ```java
 return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)              // disable the csrf token
@@ -194,3 +194,7 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
         filterChain.doFilter(request, response);
     }
 ```
+
+## Refresh token flow
+![Basic flow of refresh token](src/main/resources/refreshToken.png)
+

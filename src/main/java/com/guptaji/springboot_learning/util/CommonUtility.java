@@ -9,6 +9,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
+
 import static com.guptaji.springboot_learning.constant.UserRoles.ROLE_USER;
 
 public class CommonUtility {
@@ -19,5 +22,9 @@ public class CommonUtility {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
         return authenticate;
+    }
+
+    public static LocalDateTime currentTimestamp() {
+        return LocalDateTime.now();
     }
 }

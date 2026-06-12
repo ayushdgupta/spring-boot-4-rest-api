@@ -3,15 +3,17 @@ package com.guptaji.springboot_learning.model;
 public class UserTokenDto {
 
     private String name;
-    private String token;
+    private String JwtToken;
+    private String refreshToken;
 
     public UserTokenDto() {
         // default
     }
 
-    public UserTokenDto(String name, String token) {
+    public UserTokenDto(String name, String jwtToken, String refreshToken) {
         this.name = name;
-        this.token = token;
+        JwtToken = jwtToken;
+        this.refreshToken = refreshToken;
     }
 
     public String getName() {
@@ -22,11 +24,19 @@ public class UserTokenDto {
         this.name = name;
     }
 
-    public String getToken() {
-        return token;
+    public String getJwtToken() {
+        return JwtToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setJwtToken(String jwtToken) {
+        JwtToken = jwtToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
