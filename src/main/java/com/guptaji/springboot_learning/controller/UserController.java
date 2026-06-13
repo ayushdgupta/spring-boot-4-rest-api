@@ -4,6 +4,7 @@ import com.guptaji.springboot_learning.constant.UserRoles;
 import com.guptaji.springboot_learning.entity.RefreshToken;
 import com.guptaji.springboot_learning.entity.User;
 import com.guptaji.springboot_learning.entity.UserDto;
+import com.guptaji.springboot_learning.model.RefreshTokenDto;
 import com.guptaji.springboot_learning.model.UserLoginDto;
 import com.guptaji.springboot_learning.model.UserTokenDto;
 import com.guptaji.springboot_learning.service.impl.JwtServiceImpl;
@@ -191,6 +192,33 @@ public class UserController {
         } catch (BadCredentialsException e){
             LOG.info("user {} is not present", user.getUserName());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping(REFRESH_TOKEN)
+    public ResponseEntity<?> generateRefreshToken(@RequestBody RefreshTokenDto refreshTokenDto){
+        RefreshToken refreshTokenByUserName = refreshTokenService
+                .findRefreshTokenByUserName(refreshTokenDto.getUserName());
+        if (refreshTokenByUserName == null){
+            throw new BadCredentialsException("No Refresh token found for userName "+ refreshTokenDto.getUserName());
+        } else {
+            if (refreshTokenService.isRefreshTokenExpired(refreshTokenByUserName)){
+                throw new BadCredentialsException("Refresh token expired for userName "+ refreshTokenDto.getUserName());
+            } else {
+                if (refreshTokenDto.getRefreshToken().equalsIgnoreCase(refreshTokenByUserName.getToken())){
+                    UserLoginDto userLoginDto = new UserLoginDto();
+                    userLoginDto.setUserName(refreshTokenDto.getUserName());
+                    userLoginDto.setUserType(
+                            userService.extractUserById(
+                                    refreshTokenByUserName.getUser().getId()
+                            ).getUserType());
+                    String jwtToken = jwtService.generateToken(userLoginDto);
+                    return new ResponseEntity<>(new UserTokenDto(refreshTokenDto.getUserName(), jwtToken,
+                            refreshTokenDto.getRefreshToken()), HttpStatus.OK);
+                } else {
+                    throw new BadCredentialsException("Refresh token not matching for userName "+ refreshTokenDto.getUserName());
+                }
+            }
         }
     }
 }

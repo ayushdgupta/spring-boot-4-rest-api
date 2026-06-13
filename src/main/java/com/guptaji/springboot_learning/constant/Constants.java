@@ -8,6 +8,8 @@ public class Constants {
     public static final String SIGN_UP = "/sign-up";
     public static final String SIGN_UP_PATTERN = "/userApi/v1.0.0/sign-up";
     public static final String LOGIN = "/login";
+    public static final String REFRESH_TOKEN = "/refresh-token";
+    public static final String REFRESH_TOKEN_PATTERN = "/userApi/v1.0.0/refresh-token";
     public static final String LOGIN_PATTERN = "/userApi/v1.0.0/login";
     public static final String KEY_GEN_ALGO = "HmacSHA256";
     public static final String ROLE = "role";

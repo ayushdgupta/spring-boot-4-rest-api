@@ -107,7 +107,7 @@ public class CodeConfigs {
                 .csrf(AbstractHttpConfigurer::disable)              // disable the csrf token
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(SIGN_UP_PATTERN, LOGIN_PATTERN, SWAGGER_UI_URL,
-                                        SWAGGER_API_UI_URL).permitAll()  // permit all sign-up, login requests
+                                        SWAGGER_API_UI_URL, REFRESH_TOKEN_PATTERN).permitAll()  // permit all sign-up, login requests
                         .anyRequest().authenticated())
 //                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
